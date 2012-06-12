@@ -4,6 +4,5 @@
     <string name="hello">Hello World, CUCampusCardBalanceActivity!</string>
     <string name="app_name">CUCampusCardBalance</string>
     <string name="mystore_password">curoot</string>
-    <item name="system_ca" type="/system/etc/security/cacerts.bks"/>
 
 </resources>

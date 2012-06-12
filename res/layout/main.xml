@@ -4,15 +4,16 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/hello" />
-
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/updateBalanceBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Post" />
+        android:text="Update Balance" />
+    
+     <TextView
+        android:id="@+id/balanceTxt"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Balance: Unknown" />
 
 </LinearLayout>
