@@ -72,10 +72,9 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, String>
   private final String      pin;
   
   private final TextView    textView;
-
-  /** Called when the activity is first created. */
+  
   public CUBalanceFetcher(String user, String pin, TextView toUpdate)
-  {    
+  { 
     this.httpClient = setupClient();
     this.user       = user;
     this.pin        = pin;
