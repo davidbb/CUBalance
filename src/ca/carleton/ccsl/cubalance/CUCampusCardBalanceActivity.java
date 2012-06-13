@@ -3,6 +3,9 @@ package ca.carleton.ccsl.cubalance;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -20,7 +23,7 @@ public class CUCampusCardBalanceActivity extends Activity
 
     String user = "YOUR_STUDENT_ID";
     String pin  = "YOUR_PIN_NUMBER";
-    
+
     final Button    button  = (Button)   findViewById(R.id.updateBalanceBtn);
     final TextView  balance = (TextView) findViewById(R.id.balanceTxt);
     
@@ -34,7 +37,6 @@ public class CUCampusCardBalanceActivity extends Activity
     
     button.setOnClickListener(new View.OnClickListener() 
     {
-      @Override
       public void onClick(View v)
       {
     	SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
@@ -46,5 +48,22 @@ public class CUCampusCardBalanceActivity extends Activity
         Toast.makeText(v.getContext(), "Updating Balance...", Toast.LENGTH_SHORT).show();
       }
     });
+  }
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+      MenuInflater inflater = getMenuInflater();
+      inflater.inflate(R.menu.menu, menu);
+      return true;
+  }
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+      // Handle item selection
+      switch (item.getItemId()) {
+          case R.id.item1:
+              setContentView(R.layout.settings);
+              return true;
+          default:
+              return super.onOptionsItemSelected(item);
+      }
   }
 }

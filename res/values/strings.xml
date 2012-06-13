@@ -2,7 +2,7 @@
 <resources>
 
     <string name="hello">Hello World, CUCampusCardBalanceActivity!</string>
-    <string name="app_name">CUCampusCardBalance</string>
+    <string name="app_name">Campus Card Balance</string>
     <string name="mystore_password">curoot</string>
     <string name="test">test</string>
 
