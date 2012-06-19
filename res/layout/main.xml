@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:orientation="vertical" >
 
@@ -10,22 +10,22 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:text="@string/unknown_bal_text"
         android:gravity="center"
+        android:text="@string/unknown_bal_text"
         android:textSize="30sp" />
-    
-     <TextView
+
+    <TextView
         android:id="@+id/updatedAtTxt"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:text="@string/updated_at_text"
         android:gravity="center"
+        android:text="@string/updated_at_text"
         android:textSize="15sp" />
 
     <Button
         android:id="@+id/updateBalanceBtn"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:text="@string/update_bal_btn_text" />
