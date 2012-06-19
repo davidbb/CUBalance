@@ -1,8 +1,10 @@
 package ca.carleton.ccsl.cubalance;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -13,57 +15,74 @@ import android.widget.Toast;
 
 public class CUCampusCardBalanceActivity extends Activity
 {
-  public static final String PREFS_NAME = "MyPrefsFile";
+  private final String TAG = getClass().getSimpleName();
+
   /** Called when the activity is first created. */
   @Override
   public void onCreate(Bundle savedInstanceState)
   {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
-
-    String user = "YOUR_STUDENT_ID";
-    String pin  = "YOUR_PIN_NUMBER";
-
+    
     final Button    button  = (Button)   findViewById(R.id.updateBalanceBtn);
     final TextView  balance = (TextView) findViewById(R.id.balanceTxt);
-    
-    SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-    SharedPreferences.Editor editor = settings.edit();
-    editor.putString("user", user);
-    editor.putString("pin", pin);
-    editor.commit();
-    
-    //final CUBalanceFetcher fetchTask = new CUBalanceFetcher(user, pin, balance);
-    
+
+    final SharedPreferences settings 
+      = getSharedPreferences(CUBalanceSettings.PREFS_NAME, MODE_PRIVATE);
+ 
     button.setOnClickListener(new View.OnClickListener() 
     {
       public void onClick(View v)
       {
-    	SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-    	String prefsUser=settings.getString("user", "000000000");
-    	String prefsPin=settings.getString("pin", "000000");
-    	
-    	final CUBalanceFetcher fetchTask = new CUBalanceFetcher(prefsUser,prefsPin,balance);
-    	fetchTask.execute();
+        String prefsUser = settings.getString(CUBalanceSettings.USER_KEY, "");
+        String prefsPin  = settings.getString(CUBalanceSettings.PIN_KEY,  "");
+
+        Log.i(TAG, "Spawning a CUBalanceFetcher task.");
+        final CUBalanceFetcher fetchTask = new CUBalanceFetcher(prefsUser, prefsPin, balance);
+        fetchTask.execute();
+
         Toast.makeText(v.getContext(), "Updating Balance...", Toast.LENGTH_SHORT).show();
       }
     });
   }
+  
+  @Override
+  public void onStart()
+  {
+    super.onStart();
+    
+    final SharedPreferences settings 
+      = getSharedPreferences(CUBalanceSettings.PREFS_NAME, MODE_PRIVATE);
+       
+    String prefsUser = settings.getString("user", "");
+    String prefsPin  = settings.getString("pin",  "");
+    
+    //If the user or pin haven't been changed from the default, we need to show
+    //the settings screen before anything meaningful can happen in this Activity
+    if(prefsUser.equals("") || prefsPin.equals(""))
+    {
+      Log.i(TAG, "No first setup done. Launching CUBalanceSettings activity.");
+      Intent myIntent = new Intent(getBaseContext(), CUBalanceSettings.class);
+      startActivityForResult(myIntent, 0);
+    }
+  }
+
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
-      MenuInflater inflater = getMenuInflater();
-      inflater.inflate(R.menu.menu, menu);
-      return true;
+    MenuInflater inflater = getMenuInflater();
+    inflater.inflate(R.menu.menu, menu);
+    return true;
   }
+
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
-      // Handle item selection
-      switch (item.getItemId()) {
-          case R.id.item1:
-              setContentView(R.layout.settings);
-              return true;
-          default:
-              return super.onOptionsItemSelected(item);
-      }
+    // Handle item selection
+    switch (item.getItemId()) {
+      case R.id.item1:
+        setContentView(R.layout.settings);
+        return true;
+      default:
+        return super.onOptionsItemSelected(item);
+    }
   }
 }
