@@ -16,6 +16,7 @@
         android:id="@+id/userfield"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="10dp"
         android:ems="10"
         android:inputType="number" >
 
@@ -33,23 +34,35 @@
         android:id="@+id/pinfield"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="10dp"
         android:ems="10"
         android:inputType="numberPassword" />
-
-    <Button
-        android:id="@+id/saveprefs"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/save_prefs_btn_text" />
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
 
     <CheckBox
         android:id="@+id/refreshopt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="10dp"
         android:text="@string/refresh_checkbox_label_text" />
+         
+     <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   			android:layout_width="fill_parent"
+    		android:layout_height="fill_parent"
+    		android:layout_margin="10dp"
+    		android:stretchColumns="*">
+    		<TableRow>
+        	 <Button
+        		android:id="@+id/saveprefs"
+        		android:layout_width="wrap_content"
+        		android:layout_height="wrap_content"
+        		android:text="@string/save_prefs_btn_text" />
+        	<Button
+        		android:id="@+id/cancelprefs"
+        		android:layout_width="wrap_content"
+        		android:layout_height="wrap_content"
+        		android:text="@string/cancel_prefs_btn_text" />
+    	</TableRow>
+		</TableLayout> 
+   
 
 </LinearLayout>

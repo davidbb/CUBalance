@@ -90,11 +90,14 @@ public class CUCampusCardBalanceActivity extends Activity
   }
 
   @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
+  public boolean onOptionsItemSelected(MenuItem item) 
+  {
     // Handle item selection
-    switch (item.getItemId()) {
-      case R.id.item1:
-        setContentView(R.layout.settings);
+    switch (item.getItemId()) 
+    {
+      case R.id.menu_settings_item:
+        Intent myIntent = new Intent(getBaseContext(), CUBalanceSettings.class);
+        startActivityForResult(myIntent, 0);
         return true;
       default:
         return super.onOptionsItemSelected(item);

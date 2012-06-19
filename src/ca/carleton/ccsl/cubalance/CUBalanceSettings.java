@@ -32,15 +32,17 @@ public class CUBalanceSettings extends Activity
     final EditText txtStudentNum = (EditText) findViewById(R.id.userfield);
     final EditText txtPinNum     = (EditText) findViewById(R.id.pinfield);
     final Button   btnSave       = (Button)   findViewById(R.id.saveprefs);
+    final Button   btnCancel     = (Button)   findViewById(R.id.cancelprefs);
     
     //TODO: Code refresh functionality...
     //final CheckBox refreshbox = (CheckBox) findViewById(R.id.refreshopt);
-
-    String prefsUser = settings.getString(USER_KEY, "");
-    String prefsPin  = settings.getString(PIN_KEY,  "");
-  
-    txtStudentNum.setText(prefsUser);
-    txtPinNum.setText(prefsPin);
+    
+    btnCancel.setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View v) { 
+        finish(); //Just exit for a cancel
+      }
+    });
     
     btnSave.setOnClickListener(new OnClickListener() {
       @Override
@@ -59,5 +61,21 @@ public class CUBalanceSettings extends Activity
         finish(); //Close the activity and return
       }
     });
+  }
+  
+  @Override
+  public void onStart()
+  {
+    super.onStart();
+
+    final SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+    final EditText txtStudentNum = (EditText) findViewById(R.id.userfield);
+    final EditText txtPinNum     = (EditText) findViewById(R.id.pinfield);
+    
+    String prefsUser = settings.getString(USER_KEY, "");
+    String prefsPin  = settings.getString(PIN_KEY,  "");
+  
+    txtStudentNum.setText(prefsUser);
+    txtPinNum.setText(prefsPin);
   }
 }
