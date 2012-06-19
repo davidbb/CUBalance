@@ -19,7 +19,7 @@ import android.widget.Toast;
 public class CUCampusCardBalanceActivity extends Activity
 {
   private final String       TAG      = getClass().getSimpleName();
-  private final DateFormat   DATE_FMT = DateFormat.getTimeInstance(DateFormat.DEFAULT);
+  private final DateFormat   DATE_FMT = DateFormat.getDateTimeInstance(DateFormat.DEFAULT,DateFormat.SHORT);
   private final NumberFormat CASH_FMT = NumberFormat.getCurrencyInstance();
   
   /** Called when the activity is first created. */
