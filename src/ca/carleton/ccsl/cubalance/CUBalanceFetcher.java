@@ -50,7 +50,7 @@ import org.apache.http.protocol.HttpContext;
 
 import android.os.AsyncTask;
 
-public class CUBalanceFetcher extends AsyncTask<Void, Void, String>
+public class CUBalanceFetcher extends AsyncTask<Void, Void, Float>
 {
   private static final String FF_USER_AGENT         = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:11.0) Gecko/20100101 Firefox/11.0";
   private static final String CARLETON_LOGIN_URL    = "https://central.carleton.ca/prod/twbkwbis.P_ValLogin";
@@ -81,23 +81,25 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, String>
   }
   
   @Override
-  protected String doInBackground(Void... params)
+  protected Float doInBackground(Void... params)
   {
     //Called from within a separate thread.
     try
     {
       submitLogin(user, pin);
-      return getBalance();
+      return Float.parseFloat(getBalance());
+    } catch(NumberFormatException e) {
+      e.printStackTrace();
     } catch (ClientProtocolException e) {
       e.printStackTrace();
     } catch (IOException e) {
       e.printStackTrace();
     }
     
-    return "ERROR";
+    return 0.0f;
   }
   
-  protected void onPostExecute(String result) 
+  protected void onPostExecute(Float result) 
   {
     //Called from within UI thread.
     mainUI.updateBalance(result);

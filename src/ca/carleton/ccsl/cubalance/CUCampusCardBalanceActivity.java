@@ -1,6 +1,7 @@
 package ca.carleton.ccsl.cubalance;
 
 import java.text.DateFormat;
+import java.text.NumberFormat;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -17,8 +18,9 @@ import android.widget.Toast;
 
 public class CUCampusCardBalanceActivity extends Activity
 {
-  private final String     TAG      = getClass().getSimpleName();
-  private final DateFormat DATE_FMT = DateFormat.getTimeInstance(DateFormat.DEFAULT);
+  private final String       TAG      = getClass().getSimpleName();
+  private final DateFormat   DATE_FMT = DateFormat.getTimeInstance(DateFormat.DEFAULT);
+  private final NumberFormat CASH_FMT = NumberFormat.getCurrencyInstance();
   
   /** Called when the activity is first created. */
   @Override
@@ -65,7 +67,7 @@ public class CUCampusCardBalanceActivity extends Activity
     
     //There is a 'cached' balance, set the text box to that value.
     if(!lastBal.equals(""))
-      balance.setText("Balance: "+ lastBal);
+      balance.setText(lastBal);
     
     if(!lastUp.equals(""))
       updatedAt.setText("Last Updated: "+ lastUp);
@@ -113,7 +115,7 @@ public class CUCampusCardBalanceActivity extends Activity
     }
   }
 
-  public void updateBalance(String result)
+  public void updateBalance(float result)
   {
     final TextView  balance   = (TextView) findViewById(R.id.balanceTxt);
     final TextView  updatedAt = (TextView) findViewById(R.id.updatedAtTxt);
@@ -122,14 +124,15 @@ public class CUCampusCardBalanceActivity extends Activity
       = getSharedPreferences(CUBalanceSettings.PREFS_NAME, MODE_PRIVATE);
     final SharedPreferences.Editor editor = settings.edit();
     
-    String dateStr = DATE_FMT.format(new java.util.Date());
+    String dateStr    = DATE_FMT.format(new java.util.Date());
+    String balanceStr = CASH_FMT.format(result);
 
     Log.i(TAG, "Updating cached balance to "+ result);
-    editor.putString(CUBalanceSettings.BAL_KEY, result);
+    editor.putString(CUBalanceSettings.BAL_KEY, balanceStr);
     editor.putString(CUBalanceSettings.DATE_KEY, dateStr);
     editor.commit();
     
-    balance.setText("Balance: "+ result);
+    balance.setText(balanceStr);
     updatedAt.setText("Last Updated: "+ dateStr);
   }
 }

@@ -9,10 +9,10 @@
         android:id="@+id/balanceTxt"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_margin="20dp"
         android:gravity="center"
         android:text="@string/unknown_bal_text"
-        android:textSize="30sp" />
+        android:textSize="50sp" />
 
     <TextView
         android:id="@+id/updatedAtTxt"
