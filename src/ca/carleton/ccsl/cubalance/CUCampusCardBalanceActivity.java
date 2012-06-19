@@ -27,24 +27,12 @@ public class CUCampusCardBalanceActivity extends Activity
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
     
-    final CUCampusCardBalanceActivity mainUI = this;
-  
-    final SharedPreferences settings 
-      = getSharedPreferences(CUBalanceSettings.PREFS_NAME, MODE_PRIVATE);
-    
     final Button button = (Button) findViewById(R.id.updateBalanceBtn);
     button.setOnClickListener(new View.OnClickListener() 
     {
       public void onClick(View v)
       {
-        String prefsUser = settings.getString(CUBalanceSettings.USER_KEY, "");
-        String prefsPin  = settings.getString(CUBalanceSettings.PIN_KEY,  "");
-
-        Log.i(TAG, "Spawning a CUBalanceFetcher task.");
-        final CUBalanceFetcher fetchTask = new CUBalanceFetcher(prefsUser, prefsPin, mainUI);
-        fetchTask.execute();
-                
-        Toast.makeText(v.getContext(), "Updating Balance...", Toast.LENGTH_SHORT).show();
+        updateBalance();
       }
     });
   }
@@ -59,7 +47,8 @@ public class CUCampusCardBalanceActivity extends Activity
     
     final TextView balance   = (TextView) findViewById(R.id.balanceTxt);
     final TextView updatedAt = (TextView) findViewById(R.id.updatedAtTxt);
-     
+
+    Boolean autoUp   = settings.getBoolean(CUBalanceSettings.UPDATE_KEY, false);
     String prefsUser = settings.getString(CUBalanceSettings.USER_KEY, "");
     String prefsPin  = settings.getString(CUBalanceSettings.PIN_KEY,  "");
     String lastBal   = settings.getString(CUBalanceSettings.BAL_KEY,  "");
@@ -80,6 +69,26 @@ public class CUCampusCardBalanceActivity extends Activity
     
     if(!lastUp.equals(""))
       updatedAt.setText("Last Updated: "+ lastUp);
+    
+    if(autoUp)
+      updateBalance();
+  }
+  
+  private void updateBalance()
+  {
+    final CUCampusCardBalanceActivity mainUI = this;
+    
+    final SharedPreferences settings 
+      = getSharedPreferences(CUBalanceSettings.PREFS_NAME, MODE_PRIVATE);
+    
+    String prefsUser = settings.getString(CUBalanceSettings.USER_KEY, "");
+    String prefsPin  = settings.getString(CUBalanceSettings.PIN_KEY,  "");
+
+    Log.i(TAG, "Spawning a CUBalanceFetcher task.");
+    final CUBalanceFetcher fetchTask = new CUBalanceFetcher(prefsUser, prefsPin, mainUI);
+    fetchTask.execute();
+            
+    Toast.makeText(this, "Updating Balance...", Toast.LENGTH_SHORT).show();
   }
 
   @Override

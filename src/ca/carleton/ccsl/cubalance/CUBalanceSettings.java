@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -19,6 +20,7 @@ public class CUBalanceSettings extends Activity
   public static final String PIN_KEY    = "pin";
   public static final String BAL_KEY    = "lastBalance";
   public static final String DATE_KEY   = "lastUpdated";
+  public static final String UPDATE_KEY = "autoUpdate";
 
   /** Called when the activity is first created. */
   @Override
@@ -33,9 +35,7 @@ public class CUBalanceSettings extends Activity
     final EditText txtPinNum     = (EditText) findViewById(R.id.pinfield);
     final Button   btnSave       = (Button)   findViewById(R.id.saveprefs);
     final Button   btnCancel     = (Button)   findViewById(R.id.cancelprefs);
-    
-    //TODO: Code refresh functionality...
-    //final CheckBox refreshbox = (CheckBox) findViewById(R.id.refreshopt);
+    final CheckBox refreshbox    = (CheckBox) findViewById(R.id.refreshopt);
     
     btnCancel.setOnClickListener(new OnClickListener() {
       @Override
@@ -51,8 +51,9 @@ public class CUBalanceSettings extends Activity
         final SharedPreferences.Editor editor = settings.edit();
 
         Log.i(TAG, "Updating saved preferences.");
-        editor.putString(USER_KEY, txtStudentNum.getText().toString());
-        editor.putString(PIN_KEY,  txtPinNum.getText().toString());
+        editor.putString (USER_KEY,   txtStudentNum.getText().toString());
+        editor.putString (PIN_KEY,    txtPinNum.getText().toString());
+        editor.putBoolean(UPDATE_KEY, refreshbox.isChecked());
         editor.commit();
         
         Toast.makeText(v.getContext(), "Settings Updated", Toast.LENGTH_SHORT).show();
@@ -71,11 +72,14 @@ public class CUBalanceSettings extends Activity
     final SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
     final EditText txtStudentNum = (EditText) findViewById(R.id.userfield);
     final EditText txtPinNum     = (EditText) findViewById(R.id.pinfield);
-    
-    String prefsUser = settings.getString(USER_KEY, "");
-    String prefsPin  = settings.getString(PIN_KEY,  "");
+    final CheckBox refreshbox    = (CheckBox) findViewById(R.id.refreshopt);
+       
+    String  prefsUser = settings.getString (USER_KEY,   "");
+    String  prefsPin  = settings.getString (PIN_KEY,    "");
+    Boolean autoUp    = settings.getBoolean(UPDATE_KEY, false);
   
     txtStudentNum.setText(prefsUser);
     txtPinNum.setText(prefsPin);
+    refreshbox.setChecked(autoUp);
   }
 }
