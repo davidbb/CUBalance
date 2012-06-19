@@ -17,6 +17,8 @@ public class CUBalanceSettings extends Activity
   public static final String PREFS_NAME = "MyPrefsFile";
   public static final String USER_KEY   = "user";
   public static final String PIN_KEY    = "pin";
+  public static final String BAL_KEY    = "lastBalance";
+  public static final String DATE_KEY   = "lastUpdated";
 
   /** Called when the activity is first created. */
   @Override
@@ -47,8 +49,8 @@ public class CUBalanceSettings extends Activity
         final SharedPreferences.Editor editor = settings.edit();
 
         Log.i(TAG, "Updating saved preferences.");
-        editor.putString("user", txtStudentNum.getText().toString());
-        editor.putString("pin",  txtPinNum.getText().toString());
+        editor.putString(USER_KEY, txtStudentNum.getText().toString());
+        editor.putString(PIN_KEY,  txtPinNum.getText().toString());
         editor.commit();
         
         Toast.makeText(v.getContext(), "Settings Updated", Toast.LENGTH_SHORT).show();

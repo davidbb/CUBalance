@@ -49,7 +49,6 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 
 import android.os.AsyncTask;
-import android.widget.TextView;
 
 public class CUBalanceFetcher extends AsyncTask<Void, Void, String>
 {
@@ -71,14 +70,14 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, String>
   private final String      user;
   private final String      pin;
   
-  private final TextView    textView;
+  private final CUCampusCardBalanceActivity mainUI;
   
-  public CUBalanceFetcher(String user, String pin, TextView toUpdate)
+  public CUBalanceFetcher(String user, String pin, CUCampusCardBalanceActivity mainUI)
   { 
     this.httpClient = setupClient();
     this.user       = user;
     this.pin        = pin;
-    this.textView   = toUpdate;
+    this.mainUI     = mainUI;
   }
   
   @Override
@@ -98,10 +97,10 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, String>
     return "ERROR";
   }
   
-  protected void onPostExecute (String result) 
+  protected void onPostExecute(String result) 
   {
     //Called from within UI thread.
-    textView.setText("Balance: "+ result);
+    mainUI.updateBalance(result);
   }
   
   private HttpClient setupClient()

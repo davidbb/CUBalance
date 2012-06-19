@@ -5,17 +5,29 @@
     android:gravity="center_horizontal"
     android:orientation="vertical" >
 
-    <Button
-        android:id="@+id/updateBalanceBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Update Balance" />
-
     <TextView
         android:id="@+id/balanceTxt"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Balance: Unknown"
+        android:layout_margin="10dp"
+        android:text="@string/unknown_bal_text"
+        android:gravity="center"
         android:textSize="30sp" />
+    
+     <TextView
+        android:id="@+id/updatedAtTxt"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="@string/updated_at_text"
+        android:gravity="center"
+        android:textSize="15sp" />
+
+    <Button
+        android:id="@+id/updateBalanceBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="@string/update_bal_btn_text" />
 
 </LinearLayout>

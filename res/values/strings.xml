@@ -5,5 +5,12 @@
     <string name="app_name">Campus Card Balance</string>
     <string name="mystore_password">curoot</string>
     <string name="test">test</string>
+    <string name="unknown_bal_text">Balance: Unknown</string>
+    <string name="update_bal_btn_text">Refresh Balance</string>
+    <string name="student_num_label_text">Student Number: </string>
+    <string name="student_pin_label_text">Carleton Central PIN: </string>
+    <string name="save_prefs_btn_text">Save Preferences</string>
+    <string name="refresh_checkbox_label_text">Refresh Balance automatically when app is launched</string>
+    <string name="updated_at_text">Last Updated: Never</string>
 
 </resources>

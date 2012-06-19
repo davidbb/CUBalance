@@ -1,5 +1,7 @@
 package ca.carleton.ccsl.cubalance;
 
+import java.text.DateFormat;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,8 +17,9 @@ import android.widget.Toast;
 
 public class CUCampusCardBalanceActivity extends Activity
 {
-  private final String TAG = getClass().getSimpleName();
-
+  private final String     TAG      = getClass().getSimpleName();
+  private final DateFormat DATE_FMT = DateFormat.getTimeInstance(DateFormat.DEFAULT);
+  
   /** Called when the activity is first created. */
   @Override
   public void onCreate(Bundle savedInstanceState)
@@ -24,12 +27,12 @@ public class CUCampusCardBalanceActivity extends Activity
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
     
-    final Button    button  = (Button)   findViewById(R.id.updateBalanceBtn);
-    final TextView  balance = (TextView) findViewById(R.id.balanceTxt);
-
+    final CUCampusCardBalanceActivity mainUI = this;
+  
     final SharedPreferences settings 
       = getSharedPreferences(CUBalanceSettings.PREFS_NAME, MODE_PRIVATE);
- 
+    
+    final Button button = (Button) findViewById(R.id.updateBalanceBtn);
     button.setOnClickListener(new View.OnClickListener() 
     {
       public void onClick(View v)
@@ -38,9 +41,9 @@ public class CUCampusCardBalanceActivity extends Activity
         String prefsPin  = settings.getString(CUBalanceSettings.PIN_KEY,  "");
 
         Log.i(TAG, "Spawning a CUBalanceFetcher task.");
-        final CUBalanceFetcher fetchTask = new CUBalanceFetcher(prefsUser, prefsPin, balance);
+        final CUBalanceFetcher fetchTask = new CUBalanceFetcher(prefsUser, prefsPin, mainUI);
         fetchTask.execute();
-
+                
         Toast.makeText(v.getContext(), "Updating Balance...", Toast.LENGTH_SHORT).show();
       }
     });
@@ -53,9 +56,14 @@ public class CUCampusCardBalanceActivity extends Activity
     
     final SharedPreferences settings 
       = getSharedPreferences(CUBalanceSettings.PREFS_NAME, MODE_PRIVATE);
-       
-    String prefsUser = settings.getString("user", "");
-    String prefsPin  = settings.getString("pin",  "");
+    
+    final TextView balance   = (TextView) findViewById(R.id.balanceTxt);
+    final TextView updatedAt = (TextView) findViewById(R.id.updatedAtTxt);
+     
+    String prefsUser = settings.getString(CUBalanceSettings.USER_KEY, "");
+    String prefsPin  = settings.getString(CUBalanceSettings.PIN_KEY,  "");
+    String lastBal   = settings.getString(CUBalanceSettings.BAL_KEY,  "");
+    String lastUp    = settings.getString(CUBalanceSettings.DATE_KEY, "");
     
     //If the user or pin haven't been changed from the default, we need to show
     //the settings screen before anything meaningful can happen in this Activity
@@ -65,6 +73,13 @@ public class CUCampusCardBalanceActivity extends Activity
       Intent myIntent = new Intent(getBaseContext(), CUBalanceSettings.class);
       startActivityForResult(myIntent, 0);
     }
+    
+    //There is a 'cached' balance, set the text box to that value.
+    if(!lastBal.equals(""))
+      balance.setText("Balance: "+ lastBal);
+    
+    if(!lastUp.equals(""))
+      updatedAt.setText("Last Updated: "+ lastUp);
   }
 
   @Override
@@ -84,5 +99,25 @@ public class CUCampusCardBalanceActivity extends Activity
       default:
         return super.onOptionsItemSelected(item);
     }
+  }
+
+  public void updateBalance(String result)
+  {
+    final TextView  balance   = (TextView) findViewById(R.id.balanceTxt);
+    final TextView  updatedAt = (TextView) findViewById(R.id.updatedAtTxt);
+
+    final SharedPreferences settings 
+      = getSharedPreferences(CUBalanceSettings.PREFS_NAME, MODE_PRIVATE);
+    final SharedPreferences.Editor editor = settings.edit();
+    
+    String dateStr = DATE_FMT.format(new java.util.Date());
+
+    Log.i(TAG, "Updating cached balance to "+ result);
+    editor.putString(CUBalanceSettings.BAL_KEY, result);
+    editor.putString(CUBalanceSettings.DATE_KEY, dateStr);
+    editor.commit();
+    
+    balance.setText("Balance: "+ result);
+    updatedAt.setText("Last Updated: "+ dateStr);
   }
 }
