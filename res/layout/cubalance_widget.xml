@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/widgetBalanceTxt"
+        android:layout_width="fill_parent"
+        android:layout_height="0dip"
+        android:gravity="center"
+        android:layout_weight="1"
+        
+        android:textColor="@android:color/white"
+        android:text="@string/unknown_bal_text"
+        android:textSize="18sp"
+     />
+
+    <Button
+        android:id="@+id/widgetUpdateButton"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:textSize="12sp"
+        android:text="@string/widget_update_btn_text" />
+
+</LinearLayout>

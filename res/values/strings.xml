@@ -10,5 +10,6 @@
     <string name="refresh_checkbox_label_text">Refresh Balance automatically when app is launched</string>
     <string name="updated_at_text">Last Updated: Never</string>
     <string name="cancel_prefs_btn_text">Cancel</string>
+    <string name="widget_update_btn_text">Update</string>
 
 </resources>
