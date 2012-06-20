@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="hello">Hello World, CUCampusCardBalanceActivity!</string>
     <string name="app_name">Campus Card Balance</string>
-    <string name="mystore_password">curoot</string>
-    <string name="test">test</string>
     <string name="unknown_bal_text">$???</string>
     <string name="update_bal_btn_text">Refresh Balance</string>
     <string name="student_num_label_text">Student Number: </string>

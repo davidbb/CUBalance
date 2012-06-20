@@ -19,7 +19,7 @@ import android.widget.Toast;
 public class CUCampusCardBalanceActivity extends Activity
 {
   private final String       TAG      = getClass().getSimpleName();
-  private final DateFormat   DATE_FMT = DateFormat.getDateTimeInstance(DateFormat.DEFAULT,DateFormat.SHORT);
+  private final DateFormat   DATE_FMT = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT);
   private final NumberFormat CASH_FMT = NumberFormat.getCurrencyInstance();
   
   /** Called when the activity is first created. */
@@ -34,7 +34,7 @@ public class CUCampusCardBalanceActivity extends Activity
     {
       public void onClick(View v)
       {
-        updateBalance();
+        fetchBalance();
       }
     });
   }
@@ -73,28 +73,12 @@ public class CUCampusCardBalanceActivity extends Activity
       updatedAt.setText("Last Updated: "+ lastUp);
     
     if(autoUp)
-      updateBalance();
+      fetchBalance();
   }
   
-  private void updateBalance()
-  {
-    final CUCampusCardBalanceActivity mainUI = this;
-    
-    final SharedPreferences settings 
-      = getSharedPreferences(CUBalanceSettings.PREFS_NAME, MODE_PRIVATE);
-    
-    String prefsUser = settings.getString(CUBalanceSettings.USER_KEY, "");
-    String prefsPin  = settings.getString(CUBalanceSettings.PIN_KEY,  "");
-
-    Log.i(TAG, "Spawning a CUBalanceFetcher task.");
-    final CUBalanceFetcher fetchTask = new CUBalanceFetcher(prefsUser, prefsPin, mainUI);
-    fetchTask.execute();
-            
-    Toast.makeText(this, "Updating Balance...", Toast.LENGTH_SHORT).show();
-  }
-
   @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
+  public boolean onCreateOptionsMenu(Menu menu) 
+  {
     MenuInflater inflater = getMenuInflater();
     inflater.inflate(R.menu.menu, menu);
     return true;
@@ -114,25 +98,58 @@ public class CUCampusCardBalanceActivity extends Activity
         return super.onOptionsItemSelected(item);
     }
   }
+  
+  private void fetchBalance()
+  {
+    final CUCampusCardBalanceActivity mainUI = this;
+    
+    final SharedPreferences settings 
+      = getSharedPreferences(CUBalanceSettings.PREFS_NAME, MODE_PRIVATE);
+    
+    String prefsUser = settings.getString(CUBalanceSettings.USER_KEY, "");
+    String prefsPin  = settings.getString(CUBalanceSettings.PIN_KEY,  "");
 
-  public void updateBalance(float result)
+    Log.i(TAG, "Spawning a CUBalanceFetcher task.");
+    
+    try {
+      new CUBalanceFetcher(prefsUser, prefsPin, mainUI).execute();
+      Toast.makeText(this, "Updating Balance...", Toast.LENGTH_SHORT).show();
+    } catch(Exception e) {
+      Log.e(TAG, "Unable to instantiate CUBalanceFetcher");
+      Log.e(TAG, e.getMessage());
+      Log.e(TAG, e.toString());
+      
+      Toast.makeText(this, "Error updating balance.", Toast.LENGTH_SHORT).show();
+    }
+  }
+
+  public void updateBalance(CUBalanceResult result)
   {
     final TextView  balance   = (TextView) findViewById(R.id.balanceTxt);
     final TextView  updatedAt = (TextView) findViewById(R.id.updatedAtTxt);
+    
+    if(result.hasError())
+    {
+      Toast.makeText(this, result.getError(), Toast.LENGTH_SHORT).show();
+      return;
+    }
 
     final SharedPreferences settings 
       = getSharedPreferences(CUBalanceSettings.PREFS_NAME, MODE_PRIVATE);
     final SharedPreferences.Editor editor = settings.edit();
     
     String dateStr    = DATE_FMT.format(new java.util.Date());
-    String balanceStr = CASH_FMT.format(result);
+    String balanceStr = CASH_FMT.format(result.getBalance());
 
-    Log.i(TAG, "Updating cached balance to "+ result);
+    Log.i(TAG, "Updating cached balance to "+ balanceStr);
+    Log.i(TAG, "Updating cached balance date to "+ dateStr);
     editor.putString(CUBalanceSettings.BAL_KEY, balanceStr);
     editor.putString(CUBalanceSettings.DATE_KEY, dateStr);
     editor.commit();
     
     balance.setText(balanceStr);
     updatedAt.setText("Last Updated: "+ dateStr);
+    
+    Toast.makeText(this, "Balance updated.", Toast.LENGTH_SHORT).show();
   }
 }

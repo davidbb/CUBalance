@@ -37,6 +37,7 @@ import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
@@ -50,7 +51,7 @@ import org.apache.http.protocol.HttpContext;
 
 import android.os.AsyncTask;
 
-public class CUBalanceFetcher extends AsyncTask<Void, Void, Float>
+public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
 {
   private static final String FF_USER_AGENT         = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:11.0) Gecko/20100101 Firefox/11.0";
   private static final String CARLETON_LOGIN_URL    = "https://central.carleton.ca/prod/twbkwbis.P_ValLogin";
@@ -58,6 +59,7 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, Float>
   private static final String CARLETON_BALANCE_URL  = "https://central.carleton.ca/prod/pkg_campuscard_actrevsys.get_balances";
 
   private static final String CARLETON_LOGIN_COOKIE = "TESTID=set";
+  private static final String CARLETON_SESH_COOKIE  = "SESSID";
   private static final String CARLETON_USER_PARAM   = "sid";
   private static final String CARLETON_PIN_PARAM    = "PIN";
   
@@ -72,7 +74,7 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, Float>
   
   private final CUCampusCardBalanceActivity mainUI;
   
-  public CUBalanceFetcher(String user, String pin, CUCampusCardBalanceActivity mainUI)
+  public CUBalanceFetcher(String user, String pin, CUCampusCardBalanceActivity mainUI) throws Exception
   { 
     this.httpClient = setupClient();
     this.user       = user;
@@ -81,47 +83,37 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, Float>
   }
   
   @Override
-  protected Float doInBackground(Void... params)
+  protected CUBalanceResult doInBackground(Void... params)
   {
-    //Called from within a separate thread.
+    CUBalanceResult result = new CUBalanceResult();
+    
     try
-    {
-      submitLogin(user, pin);
-      return Float.parseFloat(getBalance());
+    {     
+      if(!submitLogin(user, pin))
+        result.setError("Invalid  Student # or PIN.");
+      else
+        result.setBalance(Float.parseFloat(getBalance()));
     } catch(NumberFormatException e) {
-      e.printStackTrace();
+      result.setError("Non-numeric balance returned by Carleton Central.");
     } catch (ClientProtocolException e) {
-      e.printStackTrace();
+      result.setError("Protocol exception connecting to Carleton Central.");
     } catch (IOException e) {
-      e.printStackTrace();
+      result.setError("Unable to connect to Carleton Central.");
     }
     
-    return 0.0f;
+    return result;
   }
   
-  protected void onPostExecute(Float result) 
+  protected void onPostExecute(CUBalanceResult result) 
   {
-    //Called from within UI thread.
     mainUI.updateBalance(result);
   }
   
-  private HttpClient setupClient()
+  private HttpClient setupClient() throws Exception
   {
     final SchemeRegistry schemeRegistry = new SchemeRegistry();
+    schemeRegistry.register(new Scheme("https", new DefaultKeyStoresSSLSocketFactory(), 443));
    
-    try
-    {
-      schemeRegistry.register(new Scheme("https", new DefaultKeyStoresSSLSocketFactory(), 443));
-    } catch (KeyManagementException e1) {
-      e1.printStackTrace();
-    } catch (UnrecoverableKeyException e1) {
-      e1.printStackTrace();
-    } catch (NoSuchAlgorithmException e1) {
-      e1.printStackTrace();
-    } catch (KeyStoreException e1) {
-      e1.printStackTrace();
-    }
-
     final HttpParams params = new BasicHttpParams();
     HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
     HttpProtocolParams.setContentCharset(params, HTTP.UTF_8);
@@ -132,7 +124,7 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, Float>
     return new DefaultHttpClient(cm, params);
   }
 
-  public void submitLogin(final String sid, final String pin) throws ClientProtocolException, IOException
+  public boolean submitLogin(final String sid, final String pin) throws ClientProtocolException, IOException
   {       
     HttpPost loginPost = new HttpPost(CARLETON_LOGIN_URL);
     
@@ -145,7 +137,17 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, Float>
     nameValuePairs.add(new BasicNameValuePair(CARLETON_PIN_PARAM, pin));
     loginPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
     
-    httpClient.execute(loginPost, localContext);      
+    httpClient.execute(loginPost, localContext);
+    
+    List<Cookie> cookies = cookieStore.getCookies();
+    
+    //If we managed to get a non-zero session cookie, we're good.
+    for(Cookie c : cookies)
+      if(c.getName().equals(CARLETON_SESH_COOKIE) && !c.getValue().equals(""))
+        return true;
+    
+    //Otherwise the login info was likely wrong.
+    return false;
   }
   
   public String getBalance() throws ClientProtocolException, IOException
