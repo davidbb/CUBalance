@@ -35,7 +35,7 @@ public class CUBalanceWidgetProvider extends AppWidgetProvider
       Intent intent = new Intent(context, CUCampusCardBalanceActivity.class);
       PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
       
-      views.setOnClickPendingIntent(R.id.widgetUpdateButton, pendingIntent);
+      //views.setOnClickPendingIntent(R.id.widgetUpdateButton, pendingIntent);
       
       appWidgetManager.updateAppWidget(appWidgetId, views);
     }    
