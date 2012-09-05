@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:ems="10"
-        android:inputType="number" >
+        android:inputType="text|none" >
 
         <requestFocus />
     </EditText>
@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:ems="10"
-        android:inputType="numberPassword" />
+        android:inputType="textPassword" />
 
     <CheckBox
         android:id="@+id/refreshopt"

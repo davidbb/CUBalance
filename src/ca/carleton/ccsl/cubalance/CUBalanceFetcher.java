@@ -54,16 +54,16 @@ import android.os.AsyncTask;
 public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
 {
   private static final String FF_USER_AGENT         = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:11.0) Gecko/20100101 Firefox/11.0";
-  private static final String CARLETON_LOGIN_URL    = "https://central.carleton.ca/prod/twbkwbis.P_ValLogin";
-  private static final String CARLETON_LOGIN_REF    = "https://central.carleton.ca/prod/twbkwbis.P_WWWLogin";
-  private static final String CARLETON_BALANCE_URL  = "https://central.carleton.ca/prod/pkg_campuscard_actrevsys.get_balances";
+  private static final String CARLETON_LOGIN_URL    = "https://ccsccl01.carleton.ca/student/local_login.php";
+  private static final String CARLETON_LOGIN_REF    = "https://ccsccl01.carleton.ca/student/local_login.php";
+  private static final String CARLETON_BALANCE_URL  = "https://ccsccl01.carleton.ca/student/welcome.php";
 
   private static final String CARLETON_LOGIN_COOKIE = "TESTID=set";
-  private static final String CARLETON_SESH_COOKIE  = "SESSID";
-  private static final String CARLETON_USER_PARAM   = "sid";
-  private static final String CARLETON_PIN_PARAM    = "PIN";
+  private static final String CARLETON_SESH_COOKIE  = "defaultlang";
+  private static final String CARLETON_USER_PARAM   = "user";
+  private static final String CARLETON_PIN_PARAM    = "pass";
   
-  private static final String  HTML_BALANCE_REGEXP  = "<TD ALIGN=\"right\">&nbsp; ([\\d]+.[\\d]{2})&nbsp;&nbsp;</TD>";
+  private static final String  HTML_BALANCE_REGEXP  = ".*<td align=right>\\$([\\d]+.[\\d]{2})</td>.*";
   private static final Pattern HTML_BALANCE_PATTERN = Pattern.compile(HTML_BALANCE_REGEXP);
     
   private final CookieStore cookieStore   = new BasicCookieStore();
@@ -128,8 +128,8 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
   {       
     HttpPost loginPost = new HttpPost(CARLETON_LOGIN_URL);
     
-    loginPost.setHeader("Referer",     CARLETON_LOGIN_REF);
-    loginPost.setHeader("Cookie",      CARLETON_LOGIN_COOKIE); 
+    //loginPost.setHeader("Referer",     CARLETON_LOGIN_REF);
+    //loginPost.setHeader("Cookie",      CARLETON_LOGIN_COOKIE); 
     loginPost.setHeader("User-Agent",  FF_USER_AGENT);
 
     List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
