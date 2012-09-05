@@ -58,7 +58,6 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
   private static final String CARLETON_LOGIN_REF    = "https://ccsccl01.carleton.ca/student/local_login.php";
   private static final String CARLETON_BALANCE_URL  = "https://ccsccl01.carleton.ca/student/welcome.php";
 
-  private static final String CARLETON_LOGIN_COOKIE = "TESTID=set";
   private static final String CARLETON_SESH_COOKIE  = "defaultlang";
   private static final String CARLETON_USER_PARAM   = "user";
   private static final String CARLETON_PIN_PARAM    = "pass";
@@ -101,6 +100,8 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
         result.setBalance(Float.parseFloat(getBalance()));
     } catch(NumberFormatException e) {
       result.setError("Non-numeric balance returned by Carleton servers.");
+    } catch(IllegalStateException e) {
+      result.setError("Unable to connect over HTTPS. Try connecting from a different network (Wi-Fi or 3G)");      
     } catch (ClientProtocolException e) {
       result.setError("Protocol exception connecting to Carleton servers.");
     } catch (IOException e) {
@@ -131,7 +132,7 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
 
   }
 
-  public boolean submitLogin(final String sid, final String pin) throws ClientProtocolException, IOException
+  public boolean submitLogin(final String sid, final String pin) throws ClientProtocolException, IllegalStateException, IOException
   {       
     HttpPost loginPost = new HttpPost(CARLETON_LOGIN_URL);
     
@@ -160,7 +161,9 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
     	  failed=true;
       
     }
+    
 	  List<Cookie> cookies = cookieStore.getCookies();
+	  
 	  //If we managed to get a non-zero session cookie and didn't get a login failed message, we're good.
 	  for(Cookie c : cookies)
 		  if(c.getName().equals(CARLETON_SESH_COOKIE) && !c.getValue().equals("") && !failed)
@@ -188,12 +191,16 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
     while((line = br.readLine()) != null) 
     {
       Matcher m = HTML_CONVENIENCE_PATTERN.matcher(line);
-      
-      if(m.matches()){
-        line=br.readLine();
-        line=br.readLine();
+
+      //Find the line preceeding the correct balance line (may be multiple balances)
+      if(m.matches())
+      {
+        //Skip ahead two lines and try to match the balance value
+        line = br.readLine();
+        line = br.readLine();
         Matcher newm = HTML_BALANCE_PATTERN.matcher(line);
-    	if(newm.matches())
+        
+        if(newm.matches())
         	balance = newm.group(1);
       }
     }

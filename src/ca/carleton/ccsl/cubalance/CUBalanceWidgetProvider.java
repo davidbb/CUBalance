@@ -1,7 +1,9 @@
 package ca.carleton.ccsl.cubalance;
 
-/*This is a placeholder for a widget that displays the current balance on the
- * home screen. 
+/*
+ * This is a placeholder for a widget that displays the current balance on the
+ * home screen. Implementation is not complete.
+ *  
  * TODO: make it refresh on tap, and refresh every X seconds.
  */
 
@@ -14,9 +16,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.widget.RemoteViews;
 
+@SuppressWarnings("unused")
 public class CUBalanceWidgetProvider extends AppWidgetProvider 
 {
-
   public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) 
   {
     super.onUpdate(context, appWidgetManager, appWidgetIds);
