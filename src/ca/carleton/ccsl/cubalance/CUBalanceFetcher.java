@@ -65,6 +65,12 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
   
   private static final String  HTML_BALANCE_REGEXP  = ".*<td align=right>\\$([\\d]+.[\\d]{2})</td>.*";
   private static final Pattern HTML_BALANCE_PATTERN = Pattern.compile(HTML_BALANCE_REGEXP);
+  
+  private static final String HTML_CONVENIENCE_REGEXP = ".*Convenience.*";
+  private static final Pattern HTML_CONVENIENCE_PATTERN = Pattern.compile(HTML_CONVENIENCE_REGEXP);
+  
+  private static final String HTML_LOGINFAILED_REGEXP = "Login failed for user.*";
+  private static final Pattern HTML_LOGINFAILED_PATTERN = Pattern.compile(HTML_LOGINFAILED_REGEXP);
     
   private final CookieStore cookieStore   = new BasicCookieStore();
   private final HttpContext localContext  = new BasicHttpContext();
@@ -90,15 +96,15 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
     try
     {     
       if(!submitLogin(user, pin))
-        result.setError("Invalid  Student # or PIN.");
+        result.setError("Incorrect username or password");
       else
         result.setBalance(Float.parseFloat(getBalance()));
     } catch(NumberFormatException e) {
-      result.setError("Non-numeric balance returned by Carleton Central.");
+      result.setError("Non-numeric balance returned by Carleton servers.");
     } catch (ClientProtocolException e) {
-      result.setError("Protocol exception connecting to Carleton Central.");
+      result.setError("Protocol exception connecting to Carleton servers.");
     } catch (IOException e) {
-      result.setError("Unable to connect to Carleton Central.");
+      result.setError("Unable to connect to Carleton servers.");
     }
     
     return result;
@@ -122,6 +128,7 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
     localContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
     
     return new DefaultHttpClient(cm, params);
+
   }
 
   public boolean submitLogin(final String sid, final String pin) throws ClientProtocolException, IOException
@@ -137,16 +144,29 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
     nameValuePairs.add(new BasicNameValuePair(CARLETON_PIN_PARAM, pin));
     loginPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
     
-    httpClient.execute(loginPost, localContext);
+    HttpResponse response = httpClient.execute(loginPost, localContext);
     
-    List<Cookie> cookies = cookieStore.getCookies();
+    InputStream       input = response.getEntity().getContent();
+    InputStreamReader isr   = new InputStreamReader(input);
+    BufferedReader    br    = new BufferedReader(isr);
+    String            line  = null;
+    boolean failed = false;		
     
-    //If we managed to get a non-zero session cookie, we're good.
-    for(Cookie c : cookies)
-      if(c.getName().equals(CARLETON_SESH_COOKIE) && !c.getValue().equals(""))
-        return true;
-    
-    //Otherwise the login info was likely wrong.
+    while((line = br.readLine()) != null) 
+    {
+      Matcher m = HTML_LOGINFAILED_PATTERN.matcher(line);
+      //Check to see if the page includes a "Login failed" message
+      if(m.matches())
+    	  failed=true;
+      
+    }
+	  List<Cookie> cookies = cookieStore.getCookies();
+	  //If we managed to get a non-zero session cookie and didn't get a login failed message, we're good.
+	  for(Cookie c : cookies)
+		  if(c.getName().equals(CARLETON_SESH_COOKIE) && !c.getValue().equals("") && !failed)
+			  return true;
+ 
+    //Otherwise there was a problem with logging in.
     return false;
   }
   
@@ -167,10 +187,15 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
     
     while((line = br.readLine()) != null) 
     {
-      Matcher m = HTML_BALANCE_PATTERN.matcher(line);
+      Matcher m = HTML_CONVENIENCE_PATTERN.matcher(line);
       
-      if(m.matches())
-        balance = m.group(1);
+      if(m.matches()){
+        line=br.readLine();
+        line=br.readLine();
+        Matcher newm = HTML_BALANCE_PATTERN.matcher(line);
+    	if(newm.matches())
+        	balance = newm.group(1);
+      }
     }
     
     return balance;
