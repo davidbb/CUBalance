@@ -192,7 +192,7 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
     {
       Matcher m = HTML_CONVENIENCE_PATTERN.matcher(line);
 
-      //Find the line preceeding the correct balance line (may be multiple balances)
+      //Find the line preceding the correct balance line (may be multiple balances)
       if(m.matches())
       {
         //Skip ahead two lines and try to match the balance value
