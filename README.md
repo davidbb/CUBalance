@@ -1,3 +1,4 @@
+Disclaimer: This is not an official Carleton University application. This app is not endorsed by Carleton or Campus Card. The official mobile site for retrieving Campus Card information is [https://ccsccl01.carleton.ca/student/local_login.php](https://ccsccl01.carleton.ca/student/local_login.php)
 Campus Card Balance
 ===================
 
