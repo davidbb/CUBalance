@@ -62,7 +62,7 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
   private static final String CARLETON_USER_PARAM   = "user";
   private static final String CARLETON_PIN_PARAM    = "pass";
   
-  private static final String  HTML_BALANCE_REGEXP  = ".*<td align=right>\\$([\\d]+.[\\d]{2})</td>.*";
+  private static final String  HTML_BALANCE_REGEXP  = ".*<td align=center>\\$([\\d]+.[\\d]{2})</td>.*";
   private static final Pattern HTML_BALANCE_PATTERN = Pattern.compile(HTML_BALANCE_REGEXP);
   
   private static final String HTML_CONVENIENCE_REGEXP = ".*Convenience.*";
@@ -196,6 +196,7 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
       if(m.matches())
       {
         //Skip ahead two lines and try to match the balance value
+        line = br.readLine();
         line = br.readLine();
         line = br.readLine();
         Matcher newm = HTML_BALANCE_PATTERN.matcher(line);
