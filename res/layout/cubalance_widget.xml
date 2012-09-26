@@ -3,14 +3,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
-    <ImageView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:background="#00000000"
-        android:scaleType="centerInside"
-        android:src="@drawable/carleton" />
-    
-    <TextView
+<TextView
         android:id="@+id/widgetBalanceTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
