@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
@@ -205,7 +206,7 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
         	balance = newm.group(1);
       }
     }
-    
+
     return balance;
   }
 
