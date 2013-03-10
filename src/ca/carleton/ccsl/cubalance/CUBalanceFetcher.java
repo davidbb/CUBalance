@@ -58,6 +58,7 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
   private static final String CARLETON_LOGIN_URL    = "https://ccsccl01.carleton.ca/student/local_login.php";
   private static final String CARLETON_LOGIN_REF    = "https://ccsccl01.carleton.ca/student/local_login.php";
   private static final String CARLETON_BALANCE_URL  = "https://ccsccl01.carleton.ca/student/welcome.php";
+  private static final String CU_HTTPS_PIN          = "322d6fcac22d947b0cd640b3512f29be89439276"
 
   private static final String CARLETON_SESH_COOKIE  = "defaultlang";
   private static final String CARLETON_USER_PARAM   = "user";
