@@ -14,7 +14,7 @@ online](http://www.droid-life.com/2012/08/14/how-to-sideload-an-application-on-a
 This app requires a MyCarletonOne username and password. These credentials are only sent to Carleton Servers over HTTPS for the purpose of retrieving the balance. We cannot see or store any Carleton login information. But don't take our word for it, check the source code, or sniff the traffic that the app generates.
 
 ###Credits###
-Campus Card Balance written by [Daniel McCarney](https://binaryparadox.net) and
+Campus Card Balance is written by [Daniel McCarney](https://binaryparadox.net) and
 [David Barrera](https://www.ccsl.carleton.ca/~dbarrera/). If you find the app
 useful feel free to buy us a coffee. We're always around campus.
 
