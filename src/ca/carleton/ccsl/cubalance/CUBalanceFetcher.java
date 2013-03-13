@@ -49,7 +49,10 @@ import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
+import org.thoughtcrime.ssl.pinning.PinningSSLSocketFactory;
+import org.thoughtcrime.ssl.pinning.PinningTrustManager;
 
+import android.content.Context;
 import android.os.AsyncTask;
 
 public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
@@ -58,7 +61,7 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
   private static final String CARLETON_LOGIN_URL    = "https://ccsccl01.carleton.ca/student/local_login.php";
   private static final String CARLETON_LOGIN_REF    = "https://ccsccl01.carleton.ca/student/local_login.php";
   private static final String CARLETON_BALANCE_URL  = "https://ccsccl01.carleton.ca/student/welcome.php";
-  private static final String CU_HTTPS_PIN          = "322d6fcac22d947b0cd640b3512f29be89439276"
+  private static final String CU_HTTPS_PIN          = "322d6fcac22d947b0cd640b3512f29be89439276";
 
   private static final String CARLETON_SESH_COOKIE  = "defaultlang";
   private static final String CARLETON_USER_PARAM   = "user";
@@ -120,8 +123,10 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
   
   private HttpClient setupClient() throws Exception
   {
+	String[] pins = new String[] {CU_HTTPS_PIN};
     final SchemeRegistry schemeRegistry = new SchemeRegistry();
-    schemeRegistry.register(new Scheme("https", new DefaultKeyStoresSSLSocketFactory(), 443));
+    
+    schemeRegistry.register(new Scheme("https", new PinningSSLSocketFactory(context, pins, 0), 443));
    
     final HttpParams params = new BasicHttpParams();
     HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
