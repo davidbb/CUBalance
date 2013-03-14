@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.net.ssl.SSLPeerUnverifiedException;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
@@ -45,7 +47,7 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
   private static final String CARLETON_LOGIN_REF    = "https://ccsccl01.carleton.ca/student/local_login.php";
   private static final String CARLETON_BALANCE_URL  = "https://ccsccl01.carleton.ca/student/welcome.php";
   private static final String CU_HTTPS_PIN          = "322d6fcac22d947b0cd640b3512f29be89439276";
-
+  
   private static final String CARLETON_SESH_COOKIE  = "defaultlang";
   private static final String CARLETON_USER_PARAM   = "user";
   private static final String CARLETON_PIN_PARAM    = "pass";
@@ -92,6 +94,8 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
       result.setError("Non-numeric balance returned by Carleton servers.");
     } catch(IllegalStateException e) {
       result.setError("Unable to connect over HTTPS. Try connecting from a different network (Wi-Fi or 3G)");      
+    } catch(SSLPeerUnverifiedException e) {
+      result.setError("Unable to verify the identity of Carleton's servers. Try connecting from a different network (Wi-Fi or 3G) or updating this app");      
     } catch (ClientProtocolException e) {
       result.setError("Protocol exception connecting to Carleton servers.");
     } catch (IOException e) {
