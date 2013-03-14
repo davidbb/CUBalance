@@ -5,10 +5,7 @@ Raven Balance
 Raven Balance is an Android app that displays the remaining balance on a [Carleton University](http://www.carleton.ca) Campus Card. That's it. 
 
 ###Install###
-The app is not available on the Play Store, so it must be sideloaded. You can [download the latest version of the apk from here](https://www.ccsl.carleton.ca/~dbarrera/CUBalance.apk). 
-
-If you are not familiar with sideloading, there are numerous [tutorials
-online](http://www.droid-life.com/2012/08/14/how-to-sideload-an-application-on-android-beginners-guide/).
+The app is available on the [Play Store](https://play.google.com/store/apps/details?id=ca.carleton.ccsl.cubalance), or you can [download the latest version of the apk from here](https://www.ccsl.carleton.ca/~dbarrera/RavenBalance.apk). 
 
 ###Security###
 This app requires a MyCarletonOne username and password. These credentials are only sent to Carleton Servers over HTTPS for the purpose of retrieving the balance. We cannot see or store any Carleton login information. But don't take our word for it, check the source code, or sniff the traffic that the app generates.
