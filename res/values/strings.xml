@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Campus Card Balance</string>
+    <string name="app_name">Raven Balance</string>
     <string name="unknown_bal_text">$???</string>
     <string name="update_bal_btn_text">Refresh Balance</string>
     <string name="student_num_label_text">MyCarletonOne Username: </string>
