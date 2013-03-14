@@ -158,12 +158,12 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
       
     }
     
-	  List<Cookie> cookies = cookieStore.getCookies();
-	  
-	  //If we managed to get a non-zero session cookie and didn't get a login failed message, we're good.
-	  for(Cookie c : cookies)
-		  if(c.getName().equals(CARLETON_SESH_COOKIE) && !c.getValue().equals("") && !failed)
-			  return true;
+    List<Cookie> cookies = cookieStore.getCookies();
+  
+    //If we managed to get a non-zero session cookie and didn't get a login failed message, we're good.
+    for(Cookie c : cookies)
+      if(c.getName().equals(CARLETON_SESH_COOKIE) && !c.getValue().equals("") && !failed)
+        return true;
  
     //Otherwise there was a problem with logging in.
     return false;
