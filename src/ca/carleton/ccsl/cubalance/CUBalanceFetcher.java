@@ -5,25 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import java.net.Socket;
-
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
@@ -37,7 +22,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -50,7 +34,6 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 import org.thoughtcrime.ssl.pinning.PinningSSLSocketFactory;
-import org.thoughtcrime.ssl.pinning.PinningTrustManager;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -75,7 +58,8 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
   
   private static final String HTML_LOGINFAILED_REGEXP = "Login failed for user.*";
   private static final Pattern HTML_LOGINFAILED_PATTERN = Pattern.compile(HTML_LOGINFAILED_REGEXP);
-    
+   
+  private final Context ctx;
   private final CookieStore cookieStore   = new BasicCookieStore();
   private final HttpContext localContext  = new BasicHttpContext();
   private final HttpClient  httpClient;
@@ -86,6 +70,7 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
   
   public CUBalanceFetcher(String user, String pin, CUCampusCardBalanceActivity mainUI) throws Exception
   { 
+    this.ctx        = mainUI.getApplicationContext();
     this.httpClient = setupClient();
     this.user       = user;
     this.pin        = pin;
@@ -123,10 +108,10 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
   
   private HttpClient setupClient() throws Exception
   {
-	String[] pins = new String[] {CU_HTTPS_PIN};
+    String[] pins = new String[] {CU_HTTPS_PIN};
     final SchemeRegistry schemeRegistry = new SchemeRegistry();
     
-    schemeRegistry.register(new Scheme("https", new PinningSSLSocketFactory(context, pins, 0), 443));
+    schemeRegistry.register(new Scheme("https", new PinningSSLSocketFactory(ctx, pins, 0), 443));
    
     final HttpParams params = new BasicHttpParams();
     HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
@@ -214,54 +199,5 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
     }
 
     return balance;
-  }
-
-  /**
-   * An SSLSocketFactory that relies on the default trust store.
-   */
-  private class DefaultKeyStoresSSLSocketFactory extends SSLSocketFactory
-  {
-    protected SSLContext sslContext = SSLContext.getInstance("SSLv3");
-
-    public DefaultKeyStoresSSLSocketFactory() throws NoSuchAlgorithmException,
-        KeyManagementException, KeyStoreException, UnrecoverableKeyException
-    {
-      super(null, null, null, null, null, null);
-      
-      final TrustManagerFactory original = TrustManagerFactory.getInstance(
-                                              TrustManagerFactory.getDefaultAlgorithm()
-                                           );
-      original.init((KeyStore) null);
-      
-      X509TrustManager defaultManager = null;
-      
-      for (TrustManager tm : original.getTrustManagers())
-        if (tm instanceof X509TrustManager)
-          defaultManager = (X509TrustManager) tm;
-      
-      sslContext.init(null, new TrustManager[] { defaultManager }, null);   
-    }
-
-    @Override
-    public Socket createSocket(Socket socket, String host, int port, boolean autoClose) throws IOException
-    {
-      SSLSocket s = (SSLSocket) sslContext.getSocketFactory().createSocket(socket, host, port, autoClose);
-      
-      //TODO: Figure out a way to not rely on this hack to disable TLS handshake.
-      s.setEnabledProtocols(new String[] { "SSLv3" });
-      
-      return s;
-    }
-
-    @Override
-    public Socket createSocket() throws IOException
-    {
-      SSLSocket s = (SSLSocket) sslContext.getSocketFactory().createSocket();
-      
-      //TODO: Figure out a way to not rely on this hack to disable TLS handshake.
-      s.setEnabledProtocols(new String[] { "SSLv3" });
-
-      return s;
-    }
   }
 }
