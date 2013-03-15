@@ -78,18 +78,18 @@ public class CUBalanceSettings extends Activity
   @Override
   public void onBackPressed()
   {
-	final SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-	String  prefsUser = settings.getString (USER_KEY,   "");
-	String  prefsPin  = settings.getString (PIN_KEY,    "");
-	// if the user presses back and hasn't saved credentials, dump back to home screen
-	if(prefsUser.equals("") || prefsPin.equals("")){
-		Intent intent = new Intent(Intent.ACTION_MAIN);
-		intent.addCategory(Intent.CATEGORY_HOME);
-		startActivity(intent);
-	}
-	else{
-		// go back to the main app without saving
-		finish();
-	}
+    final SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+    String  prefsUser = settings.getString (USER_KEY,   "");
+    String  prefsPin  = settings.getString (PIN_KEY,    "");
+    // if the user presses back and hasn't saved credentials, dump back to home screen
+    if(prefsUser.equals("") || prefsPin.equals("")){
+      Intent intent = new Intent(Intent.ACTION_MAIN);
+      intent.addCategory(Intent.CATEGORY_HOME);
+      startActivity(intent);
+    }
+    else{
+      // go back to the main app without saving
+      finish();
+    }
   }
 }
