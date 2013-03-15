@@ -11,5 +11,9 @@
     <string name="updated_at_text">Last Updated: Never</string>
     <string name="cancel_prefs_btn_text">Cancel</string>
     <string name="widget_update_btn_text">Update</string>
+    <string name="widget_logo_contentdescription">Application Logo</string>
+    <string name="widget_last_up_title">Last up:</string>
+    <string name="unknown_last_up">"???"</string>
+    <string name="widget_label">Raven Balance</string>
 
 </resources>
