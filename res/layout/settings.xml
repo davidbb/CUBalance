@@ -50,21 +50,12 @@
     		android:layout_height="fill_parent"
     		android:layout_margin="10dp"
     		android:stretchColumns="*">
-    		<TableRow>
+    		<Button
+    		    android:id="@+id/saveprefs"
+    		    android:layout_width="wrap_content"
+    		    android:layout_height="wrap_content"
+    		    android:text="@string/save_prefs_btn_text" />
 
-        	<Button
-        		android:id="@+id/cancelprefs"
-        		android:layout_width="wrap_content"
-        		android:layout_height="wrap_content"
-        		android:text="@string/cancel_prefs_btn_text" />
-
-        	<Button
-        	    android:id="@+id/saveprefs"
-        	    android:layout_width="wrap_content"
-        	    android:layout_height="wrap_content"
-        	    android:text="@string/save_prefs_btn_text" />
-
-    	</TableRow>
 		</TableLayout> 
    
 

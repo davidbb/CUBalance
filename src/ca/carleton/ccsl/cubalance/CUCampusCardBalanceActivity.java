@@ -2,6 +2,7 @@ package ca.carleton.ccsl.cubalance;
 
 import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.util.Locale;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -20,7 +21,8 @@ public class CUCampusCardBalanceActivity extends Activity
 {
   private final String       TAG      = getClass().getSimpleName();
   private final DateFormat   DATE_FMT = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT);
-  private final NumberFormat CASH_FMT = NumberFormat.getCurrencyInstance();
+  private final Locale       LOC      = new Locale("en_US");
+  private final NumberFormat CASH_FMT = NumberFormat.getCurrencyInstance(LOC);
 
   /** Called when the activity is first created. */
   @Override
