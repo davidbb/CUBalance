@@ -16,8 +16,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.widget.RemoteViews;
 
-@SuppressWarnings("unused")
 public class CUBalanceWidgetProvider extends AppWidgetProvider {
+
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 		super.onUpdate(context, appWidgetManager, appWidgetIds);
@@ -32,17 +32,19 @@ public class CUBalanceWidgetProvider extends AppWidgetProvider {
 
 			final SharedPreferences settings = context.getSharedPreferences(CUBalanceSettings.PREFS_NAME, Activity.MODE_PRIVATE);
 
-			String lastUp = settings.getString(CUBalanceSettings.DATE_KEY, context.getResources().getString(R.string.unknown_last_up));
-			views.setTextViewText(R.id.tvWidgetLastUp, lastUp);
-
 			String lastBal = settings.getString(CUBalanceSettings.BAL_KEY, context.getResources().getString(R.string.unknown_bal_text));
+			String lastUp = settings.getString(CUBalanceSettings.DATE_KEY, context.getResources().getString(R.string.unknown_last_up));
+
 			views.setTextViewText(R.id.tvWidgetBalance, lastBal);
+			views.setTextViewText(R.id.tvWidgetLastUp, lastUp);
 
 			Intent intent = new Intent(context, CUCampusCardBalanceActivity.class);
 			PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 			views.setOnClickPendingIntent(R.id.iWidgetLogo, pendingIntent);
 
-			// views.setOnClickPendingIntent(R.id.widgetUpdateButton, pendingIntent);
+			Intent refreshIntent = new Intent(context, CUBalanceFetcherService.class);
+			PendingIntent pendingRefreshIntent = PendingIntent.getService(context, 0, refreshIntent, 0);
+			views.setOnClickPendingIntent(R.id.tvWidgetBalance, pendingRefreshIntent);
 
 			appWidgetManager.updateAppWidget(appWidgetId, views);
 		}

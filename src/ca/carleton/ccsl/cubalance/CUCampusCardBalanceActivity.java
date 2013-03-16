@@ -5,8 +5,6 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import android.app.Activity;
-import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -16,15 +14,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class CUCampusCardBalanceActivity extends Activity {
 	private final String TAG = getClass().getSimpleName();
-	private final DateFormat DATE_FMT = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT);
-	private final Locale LOC = new Locale("en_US");
-	private final NumberFormat CASH_FMT = NumberFormat.getCurrencyInstance(LOC);
+	private static final Locale LOC = new Locale("en_US");
+
+	public static final DateFormat DATE_FMT = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT);
+	public static final NumberFormat CASH_FMT = NumberFormat.getCurrencyInstance(LOC);
 
 	/** Called when the activity is first created. */
 	@Override
@@ -120,7 +118,8 @@ public class CUCampusCardBalanceActivity extends Activity {
 		}
 	}
 
-	public void updateBalance(CUBalanceResult result) {
+	public void updateBalance(CUBalanceResult result) {// Saving balance to preferences has been moves to CUBlanaceFetcher.onPostExecute()
+
 		final TextView balance = (TextView) findViewById(R.id.balanceTxt);
 		final TextView updatedAt = (TextView) findViewById(R.id.updatedAtTxt);
 
@@ -129,25 +128,8 @@ public class CUCampusCardBalanceActivity extends Activity {
 			return;
 		}
 
-		final SharedPreferences settings = getSharedPreferences(CUBalanceSettings.PREFS_NAME, MODE_PRIVATE);
-		final SharedPreferences.Editor editor = settings.edit();
-
-		String dateStr = DATE_FMT.format(new java.util.Date());
+		String dateStr = DATE_FMT.format(result.getDate());
 		String balanceStr = CASH_FMT.format(result.getBalance());
-
-		Log.i(TAG, "Updating cached balance to " + balanceStr);
-		Log.i(TAG, "Updating cached balance date to " + dateStr);
-		editor.putString(CUBalanceSettings.BAL_KEY, balanceStr);
-		editor.putString(CUBalanceSettings.DATE_KEY, dateStr);
-		editor.commit();
-
-		// Update widget for new balance
-		ComponentName cn = new ComponentName(this, CUBalanceWidgetProvider.class);
-		RemoteViews views = new RemoteViews(getPackageName(), R.layout.cubalance_widget);
-		views.setTextViewText(R.id.tvWidgetBalance, balanceStr);
-		views.setTextViewText(R.id.tvWidgetLastUp, dateStr);
-		AppWidgetManager awm = AppWidgetManager.getInstance(this);
-		awm.updateAppWidget(cn, views);
 
 		balance.setText(balanceStr);
 		updatedAt.setText("Last Updated: " + dateStr);
