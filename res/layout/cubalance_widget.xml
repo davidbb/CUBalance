@@ -1,43 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/RelativeLayout1"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/appwidget_dark_bg"
-    android:orientation="horizontal" >
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
 
-    <TextView
-        android:id="@+id/tvWidgetBalance"
+<TextView
+        android:id="@+id/widgetBalanceTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/tvWidgetLastUp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/iWidgetLogo"
-        android:gravity="right"
+        android:layout_gravity="center_horizontal|center"
+        android:background="#AA000000"
         android:padding="2dip"
-        android:text="@string/unknown_bal_text"
         android:textColor="#ffffffff"
-        android:textSize="28sp" />
+        android:textSize="15sp" />
 
-    <ImageView
-        android:id="@+id/iWidgetLogo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:contentDescription="@string/widget_logo_contentdescription"
-        android:src="@drawable/ic_launcher" />
-
-    <TextView
-        android:id="@+id/tvWidgetLastUp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/iWidgetLogo"
-        android:layout_alignLeft="@+id/tvWidgetBalance"
-        android:layout_alignParentRight="true"
-        android:gravity="right"
-        android:text="@string/unknown_last_up"
-        android:textSize="13sp" />
-
-</RelativeLayout>
+</FrameLayout>
