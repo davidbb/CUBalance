@@ -4,9 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
+import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,11 +39,20 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 import org.thoughtcrime.ssl.pinning.PinningSSLSocketFactory;
 
+import android.app.IntentService;
 import android.content.Context;
-import android.os.AsyncTask;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.util.Log;
+import android.widget.Toast;
 
-public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
+public class CUBalanceFetcher extends IntentService
 {
+  private final String       TAG      = getClass().getSimpleName();
+  private final DateFormat   DATE_FMT = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT);
+  private final Locale       LOC      = new Locale("en_US");
+  private final NumberFormat CASH_FMT = NumberFormat.getCurrencyInstance(LOC);
+
   private static final String FF_USER_AGENT         = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:11.0) Gecko/20100101 Firefox/11.0";
   private static final String CARLETON_LOGIN_URL    = "https://ccsccl01.carleton.ca/student/local_login.php";
   private static final String CARLETON_LOGIN_REF    = "https://ccsccl01.carleton.ca/student/local_login.php";
@@ -61,35 +72,38 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
   private static final String HTML_LOGINFAILED_REGEXP = "Login failed for user.*";
   private static final Pattern HTML_LOGINFAILED_PATTERN = Pattern.compile(HTML_LOGINFAILED_REGEXP);
    
-  private final Context ctx;
+  private final Context ctx = this;
   private final CookieStore cookieStore   = new BasicCookieStore();
   private final HttpContext localContext  = new BasicHttpContext();
-  private final HttpClient  httpClient;
-  private final String      user;
-  private final String      pin;
+  private HttpClient  httpClient;
   
-  private final CUCampusCardBalanceActivity mainUI;
-  
-  public CUBalanceFetcher(String user, String pin, CUCampusCardBalanceActivity mainUI) throws Exception
-  { 
-    this.ctx        = mainUI.getApplicationContext();
-    this.httpClient = setupClient();
-    this.user       = user;
-    this.pin        = pin;
-    this.mainUI     = mainUI;
+  public CUBalanceFetcher() {
+		super("CUBalanceFetcher");
   }
   
   @Override
-  protected CUBalanceResult doInBackground(Void... params)
+  protected void onHandleIntent(Intent intent)
   {
+	Log.i("TAG","IntentService Started");
     CUBalanceResult result = new CUBalanceResult();
+    try {
+		this.httpClient = setupClient();
+	} catch (Exception e1) {
+		e1.printStackTrace();
+	}
+     
+    final SharedPreferences settings = getSharedPreferences(CUBalanceSettings.PREFS_NAME, MODE_PRIVATE);
+  
+    String prefsUser = settings.getString(CUBalanceSettings.USER_KEY, "");
+    String prefsPin  = settings.getString(CUBalanceSettings.PIN_KEY,  "");
     
     try
     {     
-      if(!submitLogin(user, pin))
-        result.setError("Incorrect username or password");
-      else
-        result.setBalance(Float.parseFloat(getBalance()));
+      if(!submitLogin(prefsUser, prefsPin)) {
+		result.setError("Incorrect username or password");
+	} else {
+		result.setBalance(Float.parseFloat(getBalance()));
+	}
     } catch(NumberFormatException e) {
       result.setError("Non-numeric balance returned by Carleton servers.");
     } catch(IllegalStateException e) {
@@ -101,13 +115,24 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
     } catch (IOException e) {
       result.setError("Unable to connect to Carleton servers.");
     }
+      
+    if(result.hasError())
+    {
+      Toast.makeText(this, result.getError(), Toast.LENGTH_SHORT).show();
+    } else {
+	  final SharedPreferences.Editor editor = settings.edit();
+      String dateStr    = DATE_FMT.format(new java.util.Date());
+      String balanceStr = CASH_FMT.format(result.getBalance());
     
-    return result;
-  }
-  
-  protected void onPostExecute(CUBalanceResult result) 
-  {
-    mainUI.updateBalance(result);
+      Log.i(TAG, "Updating cached balance to "+ balanceStr);
+      Log.i(TAG, "Updating cached balance date to "+ dateStr);
+      editor.putString(CUBalanceSettings.BAL_KEY, balanceStr);
+      editor.putString(CUBalanceSettings.DATE_KEY, dateStr);
+      editor.commit();
+      
+      Intent finishedIntent = new Intent("ca.carleton.ccsl.cubalance.FETCH_FINISHED");
+      sendBroadcast(finishedIntent);
+    }
   }
   
   private HttpClient setupClient() throws Exception
@@ -153,17 +178,20 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
     {
       Matcher m = HTML_LOGINFAILED_PATTERN.matcher(line);
       //Check to see if the page includes a "Login failed" message
-      if(m.matches())
-    	  failed=true;
+      if(m.matches()) {
+		failed=true;
+	}
       
     }
     
     List<Cookie> cookies = cookieStore.getCookies();
   
     //If we managed to get a non-zero session cookie and didn't get a login failed message, we're good.
-    for(Cookie c : cookies)
-      if(c.getName().equals(CARLETON_SESH_COOKIE) && !c.getValue().equals("") && !failed)
-        return true;
+    for(Cookie c : cookies) {
+		if(c.getName().equals(CARLETON_SESH_COOKIE) && !c.getValue().equals("") && !failed) {
+			return true;
+		}
+	}
  
     //Otherwise there was a problem with logging in.
     return false;
@@ -197,8 +225,9 @@ public class CUBalanceFetcher extends AsyncTask<Void, Void, CUBalanceResult>
         line = br.readLine();
         Matcher newm = HTML_BALANCE_PATTERN.matcher(line);
         
-        if(newm.matches())
-        	balance = newm.group(1);
+        if(newm.matches()) {
+			balance = newm.group(1);
+		}
       }
     }
 

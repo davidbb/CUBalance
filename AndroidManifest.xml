@@ -24,7 +24,7 @@
         </activity>
         
         <activity android:name=".CUBalanceSettings" />
-        
+        <service android:name=".CUBalanceFetcher"/>
         <!-- CUBalance Widget -->
     </application>
   

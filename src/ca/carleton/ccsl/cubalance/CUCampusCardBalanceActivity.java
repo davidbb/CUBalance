@@ -1,11 +1,10 @@
 package ca.carleton.ccsl.cubalance;
 
-import java.text.DateFormat;
-import java.text.NumberFormat;
-import java.util.Locale;
-
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,9 +19,14 @@ import android.widget.Toast;
 public class CUCampusCardBalanceActivity extends Activity
 {
   private final String       TAG      = getClass().getSimpleName();
-  private final DateFormat   DATE_FMT = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT);
-  private final Locale       LOC      = new Locale("en_US");
-  private final NumberFormat CASH_FMT = NumberFormat.getCurrencyInstance(LOC);
+  private BroadcastReceiver  myReceiver = new BroadcastReceiver() {        
+      @Override
+      public void onReceive(Context context, Intent intent) {
+          if (intent.getAction().equals("ca.carleton.ccsl.cubalance.FETCH_FINISHED")){
+        	  updateBalance();
+          }
+      }
+  };  
 
   /** Called when the activity is first created. */
   @Override
@@ -34,7 +38,8 @@ public class CUCampusCardBalanceActivity extends Activity
     final Button button = (Button) findViewById(R.id.updateBalanceBtn);
     button.setOnClickListener(new View.OnClickListener() 
     {
-      public void onClick(View v)
+      @Override
+	public void onClick(View v)
       {
         fetchBalance();
       }
@@ -68,15 +73,28 @@ public class CUCampusCardBalanceActivity extends Activity
     }
     
     //There is a 'cached' balance, set the text box to that value.
-    if(!lastBal.equals(""))
-      balance.setText(lastBal);
+    if(!lastBal.equals("")) {
+		balance.setText(lastBal);
+	}
     
-    if(!lastUp.equals(""))
-      updatedAt.setText("Last Updated: "+ lastUp);
+    if(!lastUp.equals("")) {
+		updatedAt.setText("Last Updated: "+ lastUp);
+	}
     
-    if(autoUp)
-      fetchBalance();
+    Log.i(TAG,"Registering BroadcastReceiver");
+    registerReceiver(myReceiver, new IntentFilter("ca.carleton.ccsl.cubalance.FETCH_FINISHED"));
+    
+    if(autoUp) {
+		fetchBalance();
+	}
   }
+  
+  @Override
+	protected void onPause() {
+		super.onPause();
+		Log.i(TAG,"Unregistering BroadcastReceiver");
+		unregisterReceiver(myReceiver);
+	}
   
   @Override
   public boolean onCreateOptionsMenu(Menu menu) 
@@ -103,18 +121,11 @@ public class CUCampusCardBalanceActivity extends Activity
   
   private void fetchBalance()
   {
-    final CUCampusCardBalanceActivity mainUI = this;
-    
-    final SharedPreferences settings 
-      = getSharedPreferences(CUBalanceSettings.PREFS_NAME, MODE_PRIVATE);
-    
-    String prefsUser = settings.getString(CUBalanceSettings.USER_KEY, "");
-    String prefsPin  = settings.getString(CUBalanceSettings.PIN_KEY,  "");
-
     Log.i(TAG, "Spawning a CUBalanceFetcher task.");
     
     try {
-      new CUBalanceFetcher(prefsUser, prefsPin, mainUI).execute();
+      Intent fetchBalanceIntent = new Intent(this, CUBalanceFetcher.class);
+      startService(fetchBalanceIntent);
       Toast.makeText(this, "Updating Balance...", Toast.LENGTH_SHORT).show();
     } catch(Exception e) {
       Log.e(TAG, "Unable to instantiate CUBalanceFetcher");
@@ -125,29 +136,15 @@ public class CUCampusCardBalanceActivity extends Activity
     }
   }
 
-  public void updateBalance(CUBalanceResult result)
+  public void updateBalance()
   {
     final TextView  balance   = (TextView) findViewById(R.id.balanceTxt);
     final TextView  updatedAt = (TextView) findViewById(R.id.updatedAtTxt);
-    
-    if(result.hasError())
-    {
-      Toast.makeText(this, result.getError(), Toast.LENGTH_SHORT).show();
-      return;
-    }
 
-    final SharedPreferences settings 
-      = getSharedPreferences(CUBalanceSettings.PREFS_NAME, MODE_PRIVATE);
-    final SharedPreferences.Editor editor = settings.edit();
+    final SharedPreferences settings = getSharedPreferences(CUBalanceSettings.PREFS_NAME, MODE_PRIVATE);
     
-    String dateStr    = DATE_FMT.format(new java.util.Date());
-    String balanceStr = CASH_FMT.format(result.getBalance());
-
-    Log.i(TAG, "Updating cached balance to "+ balanceStr);
-    Log.i(TAG, "Updating cached balance date to "+ dateStr);
-    editor.putString(CUBalanceSettings.BAL_KEY, balanceStr);
-    editor.putString(CUBalanceSettings.DATE_KEY, dateStr);
-    editor.commit();
+    String balanceStr = settings.getString(CUBalanceSettings.BAL_KEY, getResources().getString(R.string.unknown_bal_text));
+    String dateStr    = settings.getString(CUBalanceSettings.DATE_KEY, getResources().getString(R.string.unknown_date_text));
     
     balance.setText(balanceStr);
     updatedAt.setText("Last Updated: "+ dateStr);

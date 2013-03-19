@@ -3,6 +3,7 @@
 
     <string name="app_name">Raven Balance</string>
     <string name="unknown_bal_text">$???</string>
+    <string name="unknown_date_text">"???"</string>
     <string name="update_bal_btn_text">Refresh Balance</string>
     <string name="student_num_label_text">MyCarletonOne Username: </string>
     <string name="student_pin_label_text">Password: </string>
