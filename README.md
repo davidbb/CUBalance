@@ -11,9 +11,10 @@ The app is available on the [Play Store](https://play.google.com/store/apps/deta
 This app requires a MyCarletonOne username and password. These credentials are only sent to Carleton Servers over HTTPS for the purpose of retrieving the balance. We cannot see or store any Carleton login information. But don't take our word for it, check the source code, or sniff the traffic that the app generates.
 
 ###Credits###
-Raven Balance is written by [Daniel McCarney](https://binaryparadox.net) and
-[David Barrera](https://www.ccsl.carleton.ca/~dbarrera/). If you find the app
-useful feel free to buy us a coffee. We're always around campus.
+Raven Balance is written by [Daniel McCarney](https://binaryparadox.net) and [David Barrera](https://www.ccsl.carleton.ca/~dbarrera/). If you find the app useful, feel free to buy us a coffee. We're always around campus. We also thank the following people for their contributions to Raven Balance:
+
+* francoiscampbell - Code improvements, widget
+* Felipe Aranzeta - Raven Balance artwork 
 
 ###Screenshots###
 ![screenshot of the Raven balance app](https://binaryparadox.net/d/CCBalanceSS.png "App Screenshot")
